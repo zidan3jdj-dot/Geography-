@@ -1,4 +1,4 @@
-// ==================== البيانات العامة ====================
+// ==================== البيانات ====================
 let questionsData = [];
 let countriesData = [];
 let currentQuestions = [];
@@ -9,7 +9,41 @@ let currentCategory = "الكل";
 let mainMap, currentMarker;
 let compareChart = null;
 
-// حقائق سريعة
+// بيانات القارات
+const continentsData = {
+    asia: {
+        name: "آسيا",
+        img: "asia.jpg",
+        description: "آسيا هي أكبر قارة في العالم من حيث المساحة وعدد السكان. تضم 48 دولة، وتقع فيها أعلى قمة في العالم (إيفرست) وأخفض نقطة (البحر الميت).",
+        countries: ["الصين", "الهند", "إندونيسيا", "باكستان", "اليابان", "السعودية", "الإمارات", "قطر", "الكويت", "الأردن", "لبنان", "سوريا", "العراق", "اليمن", "عمان"]
+    },
+    africa: {
+        name: "أفريقيا",
+        img: "africa.jpg",
+        description: "أفريقيا هي ثاني أكبر قارة في العالم. تضم 54 دولة، وتعتبر مهد البشرية. فيها أكبر صحراء حارة في العالم (الصحراء الكبرى) وأطول نهر (النيل).",
+        countries: ["مصر", "الجزائر", "المغرب", "السودان", "تونس", "ليبيا", "موريتانيا", "الصومال", "جيبوتي", "جزر القمر"]
+    },
+    europe: {
+        name: "أوروبا",
+        img: "europe.jpg",
+        description: "أوروبا هي سادس أكبر قارة من حيث المساحة، ولكنها ثالثة من حيث عدد السكان. تضم 44 دولة، وتعتبر مهد الحضارة الغربية.",
+        countries: ["روسيا", "ألمانيا", "فرنسا", "إيطاليا", "إسبانيا", "المملكة المتحدة", "تركيا", "السويد", "النرويج", "سويسرا", "النمسا", "بلجيكا", "هولندا", "البرتغال"]
+    },
+    america: {
+        name: "أمريكا",
+        img: "america.jpg",
+        description: "أمريكا هي ثاني أكبر قارة في العالم من حيث المساحة. تنقسم إلى أمريكا الشمالية وأمريكا الجنوبية، وتضم 35 دولة.",
+        countries: ["الولايات المتحدة", "كندا", "المكسيك", "البرازيل", "الأرجنتين", "تشيلي", "كولومبيا", "بيرو", "فنزويلا", "كوبا"]
+    },
+    australia: {
+        name: "أستراليا (أوقيانوسيا)",
+        img: "australia.jpg",
+        description: "أوقيانوسيا هي أصغر قارة في العالم. تضم أستراليا ونيوزيلندا والجزر المحيطية. تتميز بتنوعها الطبيعي الفريد.",
+        countries: ["أستراليا", "نيوزيلندا", "بابوا غينيا الجديدة", "فيجي", "جزر سليمان"]
+    }
+};
+
+// الحقائق الجغرافية
 const importantFacts = [
     { icon: "fa-water", title: "أعمق نقطة في المحيطات", fact: "خندق ماريانا في المحيط الهادئ، عمقه 11,034 متراً." },
     { icon: "fa-mountain", title: "أعلى قمة جبلية", fact: "قمة إيفرست في الهيمالايا، ارتفاعها 8,848 متراً." },
@@ -35,6 +69,8 @@ async function loadData() {
         currentQuestions = [...questionsData];
         populateSelects();
         displayFacts();
+        displayContinents();
+        displayContinentsDetailed();
         loadUserProgress();
         updateStats();
         
@@ -53,8 +89,70 @@ async function loadData() {
     }
 }
 
+// عرض بطاقات القارات في الرئيسية
+function displayContinents() {
+    const container = document.getElementById('continentsGrid');
+    const continents = [
+        { id: 'asia', name: 'آسيا', img: 'asia.jpg' },
+        { id: 'africa', name: 'أفريقيا', img: 'africa.jpg' },
+        { id: 'europe', name: 'أوروبا', img: 'europe.jpg' },
+        { id: 'america', name: 'أمريكا', img: 'america.jpg' },
+        { id: 'australia', name: 'أوقيانوسيا', img: 'australia.jpg' }
+    ];
+    
+    container.innerHTML = continents.map(c => `
+        <div class="continent-card" onclick="showContinentDetail('${c.id}')">
+            <img src="${c.img}" alt="${c.name}" onerror="this.src='https://placehold.co/300x150/3d2b1a/d4a373?text=${c.name}'">
+            <h3>${c.name}</h3>
+            <p>استكشف القارة</p>
+        </div>
+    `).join('');
+}
+
+// عرض القارات في صفحة القارات
+function displayContinentsDetailed() {
+    const container = document.getElementById('continentsDetailed');
+    const continents = [
+        { id: 'asia', name: 'آسيا', img: 'asia.jpg', desc: 'أكبر قارة في العالم من حيث المساحة وعدد السكان.' },
+        { id: 'africa', name: 'أفريقيا', img: 'africa.jpg', desc: 'ثاني أكبر قارة، مهد البشرية وأكبر الصحاري.' },
+        { id: 'europe', name: 'أوروبا', img: 'europe.jpg', desc: 'مهد الحضارة الغربية وأكثر القارات تطوراً.' },
+        { id: 'america', name: 'أمريكا', img: 'america.jpg', desc: 'تمتد من القطب الشمالي إلى الجنوبي.' },
+        { id: 'australia', name: 'أوقيانوسيا', img: 'australia.jpg', desc: 'أصغر قارة، تضم أستراليا والجزر المحيطية.' }
+    ];
+    
+    container.innerHTML = continents.map(c => `
+        <div class="continent-card" onclick="showContinentDetail('${c.id}')">
+            <img src="${c.img}" alt="${c.name}" onerror="this.src='https://placehold.co/300x150/3d2b1a/d4a373?text=${c.name}'">
+            <h3>${c.name}</h3>
+            <p>${c.desc}</p>
+        </div>
+    `).join('');
+}
+
+// عرض تفاصيل القارة
+window.showContinentDetail = function(continentId) {
+    const continent = continentsData[continentId];
+    if (!continent) return;
+    
+    const detailDiv = document.getElementById('continentDetail');
+    detailDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3><i class="fas fa-globe"></i> ${continent.name}</h3>
+            <button class="category-btn" onclick="document.getElementById('continentDetail').classList.remove('active')">✕ إغلاق</button>
+        </div>
+        <img src="${continent.img}" alt="${continent.name}" onerror="this.src='https://placehold.co/800x300/3d2b1a/d4a373?text=${continent.name}'">
+        <p>${continent.description}</p>
+        <h4 style="color: #d4a373; margin: 15px 0 10px 0;"><i class="fas fa-flag"></i> دول القارة:</h4>
+        <div class="country-list">
+            ${continent.countries.map(c => `<div class="country-tag">${c}</div>`).join('')}
+        </div>
+    `;
+    detailDiv.classList.add('active');
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
+};
+
 function displayFacts() {
-    const container = document.getElementById('factsGrid');
+    const container = document.getElementById('factsContainer');
     container.innerHTML = importantFacts.map(f => `
         <div class="fact-card">
             <i class="fas ${f.icon}"></i>
@@ -85,9 +183,10 @@ function saveUserProgress() {
 function updateStats() {
     const accuracy = totalAnswered === 0 ? 0 : Math.round((correctCount / totalAnswered) * 100);
     const level = Math.floor(score / 100) + 1;
-    let rank = "🌱 مستكشف";
+    let rank = "🌱 مبتدئ";
     if (level >= 3) rank = "📚 خبير جغرافي";
     if (level >= 5) rank = "🏆 أستاذ جغرافيا";
+    if (level >= 8) rank = "👑 أسطورة جغرافية";
     
     document.getElementById('homeScore').innerText = score;
     document.getElementById('homeCorrect').innerText = correctCount;
@@ -189,12 +288,12 @@ function checkAnswer(selected, correct, btn) {
         streak++;
         totalAnswered++;
         if (streak > maxStreak) maxStreak = streak;
-        document.getElementById('quizFeedback').innerHTML = `<span style="color: #00e676;">✅ صحيح! +${points} نقطة (سلسلة ${streak})</span>`;
+        document.getElementById('quizFeedback').innerHTML = `<span style="color: #95d5b2;">✅ صحيح! +${points} نقطة (سلسلة ${streak})</span>`;
     } else {
         btn.classList.add('wrong');
         allBtns[correct].classList.add('correct');
         streak = 0;
-        document.getElementById('quizFeedback').innerHTML = `<span style="color: #ff5252;">❌ خطأ! الإجابة الصحيحة: ${q.a[correct]}</span>`;
+        document.getElementById('quizFeedback').innerHTML = `<span style="color: #ff9999;">❌ خطأ! الإجابة الصحيحة: ${q.a[correct]}</span>`;
     }
     
     updateStats();
@@ -205,7 +304,7 @@ function handleTimeout() {
     quizActive = false;
     streak = 0;
     const q = currentQuestions[currentQIndex];
-    document.getElementById('quizFeedback').innerHTML = `<span style="color: #ffab00;">⏰ انتهى الوقت! الإجابة: ${q.a[q.c]}</span>`;
+    document.getElementById('quizFeedback').innerHTML = `<span style="color: #ffb74d;">⏰ انتهى الوقت! الإجابة: ${q.a[q.c]}</span>`;
     document.getElementById('nextBtn').style.display = 'block';
     const allBtns = document.querySelectorAll('#answers .answer-btn');
     allBtns.forEach(b => b.style.pointerEvents = 'none');
@@ -285,19 +384,19 @@ window.compareCountries = function() {
         data: {
             labels: ['عدد السكان (مليون)', 'المساحة (ألف كم²)'],
             datasets: [
-                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#ff6b35', borderRadius: 10 },
-                { label: c2.name, data: [c2.population / 1e6, c2.area / 1e3], backgroundColor: '#00d2ff', borderRadius: 10 }
+                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#d4a373', borderRadius: 10 },
+                { label: c2.name, data: [c2.population / 1e6, c2.area / 1e3], backgroundColor: '#8b6946', borderRadius: 10 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { labels: { color: '#ffffff' } }
+                legend: { labels: { color: '#f5e6d3' } }
             },
             scales: {
-                y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                y: { ticks: { color: '#f5e6d3' }, grid: { color: 'rgba(212, 163, 115, 0.2)' } },
+                x: { ticks: { color: '#f5e6d3' }, grid: { color: 'rgba(212, 163, 115, 0.2)' } }
             }
         }
     });
@@ -359,12 +458,12 @@ window.navigateTo = function(pageId) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
-    document.querySelectorAll('.nav-link').forEach(btn => {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
     document.getElementById(pageId).classList.add('active');
-    document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
+    document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
     
     if (pageId === 'maps') {
         if (mainMap) mainMap.invalidateSize();
@@ -380,14 +479,14 @@ window.navigateTo = function(pageId) {
 
 function showToast(msg) {
     const toast = document.createElement('div');
-    toast.className = 'toast-msg';
+    toast.className = 'toast';
     toast.innerText = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
 }
 
 // ربط أزرار التنقل
-document.querySelectorAll('.nav-link').forEach(btn => {
+document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         navigateTo(btn.dataset.page);
     });
