@@ -2,172 +2,198 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>المركز الجغرافي العربي | الموسوعة الجغرافية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المركز الجغرافي العربي | الموسوعة الرسمية</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- الخطوط -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tahoma:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Leaflet للخرائط -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- خلفية متحركة 3D -->
-    <div class="bg-particles"></div>
-    
-    <div class="stars"></div>
-    <div class="twinkling"></div>
-
-    <div class="app-wrapper">
-        <!-- الهيدر -->
-        <header class="hero-header">
-            <div class="hero-content">
-                <div class="hero-icon">
-                    <i class="fas fa-globe-americas"></i>
+    <div class="wrapper">
+        
+        <!-- الهيدر الكلاسيكي -->
+        <div class="header">
+            <div class="header-decoration"></div>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-globe-africa"></i>
+                    <h1>المركز الجغرافي العربي</h1>
                 </div>
-                <h1>المركز الجغرافي العربي</h1>
-                <p>اكتشف العالم بعيون عربية | الموسوعة الجغرافية الرسمية</p>
+                <p class="subtitle">اكتشف العالم بعيون عربية | الموسوعة الجغرافية الرسمية</p>
             </div>
-        </header>
+            <div class="header-decoration-bottom"></div>
+        </div>
 
-        <!-- التنقل -->
-        <nav class="navigation">
-            <button class="nav-link active" data-page="home">
-                <i class="fas fa-home"></i>
-                <span>الرئيسية</span>
+        <!-- شريط التنقل -->
+        <div class="nav-menu">
+            <button class="nav-btn active" data-page="home">
+                <i class="fas fa-home"></i> الرئيسية
             </button>
-            <button class="nav-link" data-page="maps">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>الخرائط</span>
+            <button class="nav-btn" data-page="continents">
+                <i class="fas fa-globe"></i> القارات
             </button>
-            <button class="nav-link" data-page="quiz">
-                <i class="fas fa-brain"></i>
-                <span>التحدي</span>
+            <button class="nav-btn" data-page="maps">
+                <i class="fas fa-map"></i> الخرائط
             </button>
-            <button class="nav-link" data-page="compare">
-                <i class="fas fa-chart-line"></i>
-                <span>المقارنة</span>
+            <button class="nav-btn" data-page="quiz">
+                <i class="fas fa-question-circle"></i> التحدي
             </button>
-            <button class="nav-link" data-page="stats">
-                <i class="fas fa-trophy"></i>
-                <span>الإحصائيات</span>
+            <button class="nav-btn" data-page="compare">
+                <i class="fas fa-chart-bar"></i> المقارنة
             </button>
-        </nav>
+            <button class="nav-btn" data-page="stats">
+                <i class="fas fa-chart-line"></i> الإحصائيات
+            </button>
+        </div>
 
-        <!-- المحتوى -->
-        <main class="page-container">
-            <!-- الصفحة الرئيسية -->
+        <!-- المحتوى الرئيسي -->
+        <div class="content">
+            
+            <!-- ========== الصفحة الرئيسية ========== -->
             <div id="home" class="page active">
-                <div class="facts-grid" id="factsGrid"></div>
-                
-                <div class="dashboard">
-                    <div class="dashboard-card glass">
-                        <div class="card-icon gradient-bg">
-                            <i class="fas fa-user-astronaut"></i>
+                <!-- بطاقات القارات -->
+                <div class="section-title">
+                    <i class="fas fa-globe-asia"></i>
+                    <h2>قارات العالم</h2>
+                </div>
+                <div class="continents-grid" id="continentsGrid"></div>
+
+                <!-- لوحة الإحصائيات -->
+                <div class="dashboard-row">
+                    <div class="dashboard-box">
+                        <div class="box-header">
+                            <i class="fas fa-user-graduate"></i>
+                            <h3>رحلة المستكشف</h3>
                         </div>
-                        <h3>رحلة المستكشف</h3>
-                        <div class="stats-dashboard">
-                            <div class="stat-circle">
-                                <span class="stat-number" id="homeScore">0</span>
-                                <span class="stat-title">نقاط</span>
+                        <div class="stats-row">
+                            <div class="stat">
+                                <span class="stat-num" id="homeScore">0</span>
+                                <span class="stat-text">نقاط</span>
                             </div>
-                            <div class="stat-circle">
-                                <span class="stat-number" id="homeCorrect">0</span>
-                                <span class="stat-title">صحيح</span>
+                            <div class="stat">
+                                <span class="stat-num" id="homeCorrect">0</span>
+                                <span class="stat-text">صحيح</span>
                             </div>
-                            <div class="stat-circle">
-                                <span class="stat-number" id="homeAccuracy">0%</span>
-                                <span class="stat-title">دقة</span>
+                            <div class="stat">
+                                <span class="stat-num" id="homeAccuracy">0%</span>
+                                <span class="stat-text">دقة</span>
                             </div>
-                            <div class="stat-circle">
-                                <span class="stat-number" id="homeLevel">1</span>
-                                <span class="stat-title">مستوى</span>
+                            <div class="stat">
+                                <span class="stat-num" id="homeLevel">1</span>
+                                <span class="stat-text">مستوى</span>
                             </div>
                         </div>
-                        <button class="btn-glow" onclick="window.navigateTo('quiz')">
-                            <i class="fas fa-play"></i> ابدأ التحدي
+                        <button class="btn-start" onclick="navigateTo('quiz')">
+                            <i class="fas fa-play"></i> ابدأ التحدي الجغرافي
                         </button>
                     </div>
-                    
-                    <div class="dashboard-card glass">
-                        <div class="card-icon gradient-bg">
-                            <i class="fas fa-globe-asia"></i>
+
+                    <div class="dashboard-box">
+                        <div class="box-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>معلومات سريعة</h3>
                         </div>
-                        <h3>معلومات سريعة</h3>
                         <div class="quick-info" id="quickInfo"></div>
                     </div>
                 </div>
+
+                <!-- حقائق مذهلة -->
+                <div class="section-title">
+                    <i class="fas fa-star-of-life"></i>
+                    <h2>حقائق جغرافية مذهلة</h2>
+                </div>
+                <div class="facts-grid" id="factsContainer"></div>
             </div>
 
-            <!-- صفحة الخرائط -->
+            <!-- ========== صفحة القارات ========== -->
+            <div id="continents" class="page">
+                <div class="section-title">
+                    <i class="fas fa-map"></i>
+                    <h2>استكشف القارات</h2>
+                </div>
+                <div class="continents-detailed" id="continentsDetailed"></div>
+                <div id="continentDetail" class="continent-detail"></div>
+            </div>
+
+            <!-- ========== صفحة الخرائط ========== -->
             <div id="maps" class="page">
-                <div class="glass">
-                    <div class="section-title">
-                        <i class="fas fa-map"></i>
+                <div class="map-container">
+                    <div class="card-header">
+                        <i class="fas fa-map-marked-alt"></i>
                         <h2>الخريطة التفاعلية</h2>
                     </div>
                     <div class="search-area">
                         <input type="text" id="searchInput" placeholder="🔍 ابحث عن مدينة، دولة، أو معلم...">
-                        <button class="btn-search" onclick="window.searchLocation()"><i class="fas fa-search"></i></button>
+                        <button class="search-btn" onclick="searchLocation()"><i class="fas fa-search"></i></button>
                     </div>
                     <div id="map"></div>
                     <div class="map-buttons">
-                        <button class="btn-outline" onclick="window.changeLayer('street')"><i class="fas fa-map"></i> خريطة</button>
-                        <button class="btn-outline" onclick="window.changeLayer('satellite')"><i class="fas fa-satellite"></i> قمر صناعي</button>
+                        <button class="btn-map" onclick="changeLayer('street')"><i class="fas fa-map"></i> خريطة</button>
+                        <button class="btn-map" onclick="changeLayer('satellite')"><i class="fas fa-satellite"></i> قمر صناعي</button>
                     </div>
                     <div id="mapInfo" class="map-info"></div>
                 </div>
             </div>
 
-            <!-- صفحة التحدي -->
+            <!-- ========== صفحة التحدي ========== -->
             <div id="quiz" class="page">
-                <div class="glass">
-                    <div class="section-title">
-                        <i class="fas fa-question-circle"></i>
+                <div class="quiz-container">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i>
                         <h2>التحدي الجغرافي</h2>
                     </div>
-                    <div class="quiz-bar">
-                        <div class="timer-circle">
+                    <div class="quiz-controls">
+                        <div class="timer">
                             <i class="fas fa-hourglass-half"></i>
                             <span id="timer">00:15</span>
                         </div>
-                        <button class="btn-category" onclick="window.changeCategory()">
-                            <i class="fas fa-layer-group"></i> <span id="currentCategory">الكل</span>
+                        <button class="category-btn" onclick="changeCategory()">
+                            <i class="fas fa-tags"></i> <span id="currentCategory">الكل</span>
                         </button>
                     </div>
                     <div id="question" class="question-card"></div>
-                    <div id="answers" class="answers-container"></div>
-                    <div id="quizFeedback" class="quiz-feedback"></div>
-                    <button id="nextBtn" class="btn-next" onclick="window.nextQuestion()">السؤال التالي <i class="fas fa-arrow-left"></i></button>
+                    <div id="answers" class="answers-grid"></div>
+                    <div id="quizFeedback" class="feedback"></div>
+                    <button id="nextBtn" class="next-btn" onclick="nextQuestion()">السؤال التالي <i class="fas fa-arrow-left"></i></button>
                 </div>
             </div>
 
-            <!-- صفحة المقارنة -->
+            <!-- ========== صفحة المقارنة ========== -->
             <div id="compare" class="page">
-                <div class="glass">
-                    <div class="section-title">
-                        <i class="fas fa-chart-simple"></i>
-                        <h2>مقارنة الدول</h2>
+                <div class="compare-container">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h2>مقارنة شاملة بين الدول</h2>
                     </div>
-                    <div class="compare-boxes">
-                        <select id="country1" class="country-picker" onchange="window.compareCountries()"></select>
-                        <select id="country2" class="country-picker" onchange="window.compareCountries()"></select>
+                    <div class="compare-selects">
+                        <select id="country1" class="country-sel" onchange="compareCountries()"></select>
+                        <select id="country2" class="country-sel" onchange="compareCountries()"></select>
                     </div>
-                    <div id="compareResult" class="compare-cards"></div>
+                    <div id="compareResult" class="compare-result"></div>
                     <div class="chart-area">
                         <canvas id="compareChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- صفحة الإحصائيات -->
+            <!-- ========== صفحة الإحصائيات ========== -->
             <div id="stats" class="page">
-                <div class="glass">
-                    <div class="section-title">
-                        <i class="fas fa-chart-line"></i>
+                <div class="stats-container">
+                    <div class="card-header">
+                        <i class="fas fa-chart-simple"></i>
                         <h2>إنجازاتك الجغرافية</h2>
                     </div>
                     <div class="achievements">
@@ -197,12 +223,19 @@
                             <div class="achievement-label">الرتبة</div>
                         </div>
                     </div>
-                    <button class="btn-reset" onclick="window.resetProgress()">
+                    <button class="reset-btn" onclick="resetProgress()">
                         <i class="fas fa-trash-alt"></i> إعادة تعيين التقدم
                     </button>
                 </div>
             </div>
-        </main>
+
+        </div>
+
+        <!-- الفوتر -->
+        <div class="footer">
+            <p>© 2024 المركز الجغرافي العربي | جميع الحقوق محفوظة | المرجع الرسمي للمعلومات الجغرافية</p>
+        </div>
+
     </div>
 
     <script src="script.js"></script>
