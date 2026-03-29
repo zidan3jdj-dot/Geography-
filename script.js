@@ -1,67 +1,74 @@
-// Scroll smooth
-function go(id){
-  document.getElementById(id).scrollIntoView({behavior:'smooth'});
-}
+const GeoApp = {
+    state: {
+        score: 0,
+        streak: 0,
+        currentPage: 'home',
+        questions: []
+    },
 
-// Scroll Animation
-const fades = document.querySelectorAll('.fade');
-window.addEventListener('scroll', ()=>{
-  fades.forEach(el=>{
-    if(el.getBoundingClientRect().top < window.innerHeight - 100){
-      el.classList.add('show');
+    init() {
+        this.bindEvents();
+        this.loadInitialData();
+        console.log("GeoPro System Initialized...");
+    },
+
+    bindEvents() {
+        // التنقل بين الصفحات
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const page = e.currentTarget.dataset.page;
+                this.navigateTo(page);
+            });
+        });
+    },
+
+    navigateTo(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+        }
+
+        if (pageId === 'maps') this.initMap();
+    },
+
+    async loadInitialData() {
+        try {
+            const response = await fetch('questions.json');
+            this.state.questions = await response.json();
+            this.renderContinents();
+        } catch (err) {
+            console.error("Data Load Error:", err);
+        }
+    },
+
+    renderContinents() {
+        const grid = document.getElementById('continents-grid');
+        const continents = [
+            { name: 'آسيا', icon: 'fa-mosque', count: 48 },
+            { name: 'أفريقيا', icon: 'fa-hippo', count: 54 },
+            { name: 'أوروبا', icon: 'fa-euro-sign', count: 44 }
+        ];
+
+        grid.innerHTML = continents.map(c => `
+            <div class="continent-card">
+                <i class="fas ${c.icon} fa-2x" style="color: var(--primary)"></i>
+                <h3 style="margin: 15px 0 10px">${c.name}</h3>
+                <p style="color: var(--text-muted)">تضم ${c.count} دولة مسجلة.</p>
+            </div>
+        `).join('');
+    },
+
+    initMap() {
+        if (this.map) return;
+        this.map = L.map('mainMap').setView([20, 0], 2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(this.map);
     }
-  });
-});
+};
 
-// QUIZ SYSTEM
-let score = 0;
-let current = 0;
-
-fetch("questions.json")
-.then(res => res.json())
-.then(data => {
-  window.qs = data;
-  loadQ();
-});
-
-function loadQ(){
-  let q = qs[current];
-  document.getElementById("question").innerText = q.q;
-
-  let div = document.getElementById("answers");
-  div.innerHTML = "";
-
-  q.options.forEach((op,i)=>{
-    let btn = document.createElement("button");
-    btn.innerText = op;
-    btn.onclick = ()=>check(i);
-    div.appendChild(btn);
-  });
-}
-
-function check(i){
-  let q = qs[current];
-
-  if(i === q.answer){
-    score++;
-    document.getElementById("result").innerText = "✔️ صح";
-  } else {
-    document.getElementById("result").innerText = "❌ غلط";
-  }
-
-  current = (current + 1) % qs.length;
-  setTimeout(loadQ,1000);
-}
-
-// LEAFLET MAP
-var map = L.map('map').setView([20, 0], 2);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-// عند الضغط
-map.on('click', function(e){
-  L.popup()
-    .setLatLng(e.latlng)
-    .setContent("📍 " + e.latlng.toString())
-    .openOn(map);
-});
+document.addEventListener('DOMContentLoaded', () => GeoApp.init());
