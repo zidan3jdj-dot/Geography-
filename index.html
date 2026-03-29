@@ -2,54 +2,50 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>الجغرافي - كلمات كراش</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>الجغرافي Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="top-bar">
-            <div class="settings-icon">⚙️</div>
-            <div class="coins-display">
-                <span id="coin-count">1103</span>
-                <div class="coin-img">💰</div>
-            </div>
+    <div id="map-screen" class="screen">
+        <div class="header">
+            <div class="coins">💰 <span id="coins-map">1123</span></div>
+            <div class="wheel-icon" onclick="showWheel()">🎡</div>
         </div>
-
-        <div class="game-area">
-            <div class="level-info">
-                <span id="level-number">مرحلة 1</span>
-                <div id="category-badge">تضاريس</div>
+        <div class="map-container" id="map-container">
             </div>
+    </div>
 
-            <div class="question-card">
-                <div id="question-text">ما هو الجبل الأعلى في أفريقيا؟</div>
-            </div>
-
-            <div class="answer-section" id="answer-slots">
-                </div>
-
-            <div class="letters-grid" id="letters-grid">
-                </div>
+    <div id="game-screen" class="screen" style="display:none;">
+        <div class="header">
+            <button onclick="backToMap()">🔙</button>
+            <div id="level-num">مرحلة 1</div>
+            <div class="coins">💰 <span id="coins-game">1123</span></div>
         </div>
-
-        <div class="footer-controls">
-            <button class="control-btn hint-btn" onclick="useHint()">تلميح (20 💰)</button>
-            <button class="control-btn clear-btn" onclick="clearCurrentAnswer()">مسح</button>
+        <div class="question-box" id="q-text">السؤال يظهر هنا</div>
+        <div class="answer-slots" id="slots"></div>
+        <div class="grid-container" id="grid"></div>
+        <div class="footer">
+            <button class="hint-btn" onclick="useHint()">تلميح (20 💰)</button>
         </div>
     </div>
 
-    <div id="win-overlay" class="overlay">
-        <div class="win-card">
-            <h2>رائع! 🎉</h2>
-            <p>لقد ربحت 20 قطعة ذهبية</p>
-            <div class="win-coins">💰 +20</div>
-            <button class="next-btn" onclick="nextLevel()">المرحلة التالية</button>
+    <div id="wheel-overlay" class="overlay">
+        <div class="wheel-content">
+            <div class="wheel" id="main-wheel">
+                <div class="slice" style="--i:1;--clr:#ff5e57;">50</div>
+                <div class="slice" style="--i:2;--clr:#ffdd59;">20</div>
+                <div class="slice" style="--i:3;--clr:#ff5e57;">100</div>
+                <div class="slice" style="--i:4;--clr:#ffdd59;">10</div>
+            </div>
+            <button class="spin-btn" onclick="spinWheel()">تدوير (1)</button>
+            <button onclick="closeWheel()">إغلاق</button>
         </div>
     </div>
 
+    <script src="levels.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
