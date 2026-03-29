@@ -1,64 +1,92 @@
-:root {
-    --primary: #2d3436;
-    --accent: #00b894;
-    --bg-color: #dfe6e9;
-}
-
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #74b9ff, #a29bfe);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    direction: rtl;
+    margin: 0; padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background: #23a6d5;
+    background: linear-gradient(-45deg, #23a6d5, #23d5ab);
+    height: 100vh; overflow: hidden;
+    display: flex; justify-content: center;
 }
 
-#game-container {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: center;
+.app-container {
+    width: 100%; max-width: 500px;
+    height: 100%; display: flex; flex-direction: column;
+    padding: 15px; position: relative;
 }
 
-.answer-slots {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin: 20px 0;
+/* Top Bar */
+.top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
 }
 
+.coins-display {
+    background: rgba(0,0,0,0.3);
+    padding: 5px 15px; border-radius: 20px;
+    color: white; font-weight: bold;
+    display: flex; align-items: center; gap: 8px;
+}
+
+/* Question Area */
+.level-info { margin-top: 20px; text-align: center; }
+#level-number { color: white; font-size: 1.5rem; font-weight: 900; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+#category-badge {
+    background: #f1c40f; color: #2c3e50;
+    display: inline-block; padding: 2px 15px;
+    border-radius: 10px; font-size: 0.9rem; font-weight: bold;
+}
+
+.question-card {
+    background: white; margin: 20px 0;
+    padding: 20px; border-radius: 15px;
+    box-shadow: 0 8px 0 #ddd;
+    min-height: 80px; display: flex; align-items: center; justify-content: center;
+}
+#question-text { color: #2c3e50; font-size: 1.2rem; font-weight: bold; text-align: center; }
+
+/* Answer Slots */
+.answer-section {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; flex-wrap: wrap;
+}
 .slot {
-    width: 35px;
-    height: 35px;
-    border-bottom: 3px solid var(--primary);
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--accent);
+    width: 40px; height: 40px; background: rgba(255,255,255,0.2);
+    border-bottom: 4px solid white; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; font-weight: bold; color: white;
 }
 
+/* Grid */
 .letters-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; padding: 10px;
 }
-
 .letter-btn {
-    background: white;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-    transition: 0.2s;
+    background: white; border: none; height: 50px;
+    border-radius: 10px; font-size: 1.3rem; font-weight: bold;
+    color: #34495e; cursor: pointer;
+    box-shadow: 0 4px 0 #bdc3c7; transition: 0.1s;
 }
+.letter-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #bdc3c7; }
 
-.letter-btn:active { transform: scale(0.9); }
+/* Buttons */
+.footer-controls { display: flex; gap: 10px; margin-top: auto; padding-bottom: 20px; }
+.control-btn {
+    flex: 1; padding: 12px; border: none; border-radius: 12px;
+    font-weight: bold; font-family: 'Cairo'; font-size: 1rem; cursor: pointer;
+}
+.hint-btn { background: #f1c40f; color: #2c3e50; box-shadow: 0 4px 0 #c49b0e; }
+.clear-btn { background: #e74c3c; color: white; box-shadow: 0 4px 0 #c0392b; }
+
+/* Overlay */
+.overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+}
+.win-card {
+    background: white; padding: 40px; border-radius: 25px;
+    text-align: center; width: 80%; max-width: 300px;
+}
+.next-btn {
+    background: #2ecc71; color: white; border: none;
+    padding: 10px 30px; border-radius: 10px; margin-top: 20px; font-size: 1.1rem;
+}
