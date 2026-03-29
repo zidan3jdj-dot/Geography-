@@ -1,88 +1,62 @@
-// بيانات اللعبة مدمجة (Production Data)
-const gameData = [
-    { id: 1, q: "ما هي عاصمة دولة فلسطين؟", a: "القدس", cat: "عواصم", grid: "ا ل ق د س م و ن ر ت ج ب" },
-    { id: 2, q: "أطول نهر في العالم؟", a: "النيل", cat: "تضاريس", grid: "ا ل ن ي ل ف ر ا ت م ك هـ" },
-    { id: 3, q: "أين توجد أهرامات الجيزة؟", a: "مصر", cat: "معالم", grid: "م ص ر س ع و د ي ا ل هـ" },
-    { id: 4, q: "أكبر دولة مساحة في العالم؟", a: "روسيا", cat: "جغرافيا سياسية", grid: "ر و س ي ا ص ي ن ك ن د ا" }
-];
+let coins = 1123;
+let currentLvlIndex = 0;
 
-let currentLevel = 0;
-let coins = 1103;
-let currentInput = "";
-
-function initGame() {
-    const level = gameData[currentLevel];
-    document.getElementById('level-number').innerText = `مرحلة ${level.id}`;
-    document.getElementById('category-badge').innerText = level.cat;
-    document.getElementById('question-text').innerText = level.q;
-    document.getElementById('coin-count').innerText = coins;
-    
-    // إنشاء الخانات
-    const slots = document.getElementById('answer-slots');
-    slots.innerHTML = "";
-    for(let i=0; i < level.a.length; i++) {
-        slots.innerHTML += `<div class="slot" id="s-${i}"></div>`;
-    }
-
-    // إنشاء الشبكة
-    const grid = document.getElementById('letters-grid');
-    grid.innerHTML = "";
-    level.grid.split(" ").forEach(char => {
-        const btn = document.createElement('button');
-        btn.className = "letter-btn";
-        btn.innerText = char;
-        btn.onclick = () => handleLetterClick(char, btn);
-        grid.appendChild(btn);
+// 1. نظام توليد الخريطة (زي صور كلمات كراش)
+function renderMap() {
+    const container = document.getElementById('map-container');
+    container.innerHTML = "";
+    allLevels.forEach((lvl, index) => {
+        const div = document.createElement('div');
+        div.className = `map-node ${index <= currentLvlIndex ? 'active' : 'locked'}`;
+        div.innerText = lvl.id;
+        div.style.left = lvl.pos.x + "%";
+        div.style.top = lvl.pos.y + "%";
+        div.onclick = () => { if(index <= currentLvlIndex) startLevel(index); };
+        container.appendChild(div);
     });
-    currentInput = "";
 }
 
-function handleLetterClick(char, btn) {
-    const level = gameData[currentLevel];
-    if (currentInput.length < level.a.length) {
-        document.getElementById(`s-${currentInput.length}`).innerText = char;
-        currentInput += char;
-        btn.style.visibility = "hidden"; // إخفاء الحرف المستخدم
-
-        if (currentInput === level.a) {
-            setTimeout(showWin, 300);
-        } else if (currentInput.length === level.a.length) {
-            setTimeout(() => {
-                alert("إجابة خاطئة!");
-                clearCurrentAnswer();
-            }, 200);
-        }
-    }
+// 2. تدوير الحروف (Shuffle)
+function shuffleGrid(letters) {
+    let arr = letters.split(" ");
+    return arr.sort(() => Math.random() - 0.5);
 }
 
-function clearCurrentAnswer() {
-    currentInput = "";
-    initGame(); // إعادة تحميل المرحلة لتظهر الحروف المخفية
+// 3. عجلة الحظ (Logic)
+function spinWheel() {
+    const wheel = document.getElementById('main-wheel');
+    let deg = Math.floor(5000 + Math.random() * 5000);
+    wheel.style.transition = 'all 5s ease-out';
+    wheel.style.transform = `rotate(${deg}deg)`;
+    setTimeout(() => {
+        coins += 20; // جائزة افتراضية
+        updateCoins();
+        alert("مبروك فزت بـ 20 قطعة ذهبية!");
+    }, 5000);
 }
 
-function showWin() {
-    coins += 20;
-    document.getElementById('win-overlay').style.display = "flex";
+function startLevel(index) {
+    currentLvlIndex = index;
+    const lvl = allLevels[index];
+    document.getElementById('map-screen').style.display = "none";
+    document.getElementById('game-screen').style.display = "block";
+    document.getElementById('q-text').innerText = lvl.q;
+    
+    // توليد الشبكة مع بعثرة الحروف
+    const grid = document.getElementById('grid');
+    grid.innerHTML = "";
+    shuffleGrid(lvl.grid).forEach(char => {
+        const b = document.createElement('button');
+        b.className = "letter-btn";
+        b.innerText = char;
+        b.onclick = () => { /* منطق الضغط */ };
+        grid.appendChild(b);
+    });
 }
 
-function nextLevel() {
-    currentLevel++;
-    if (currentLevel < gameData.length) {
-        document.getElementById('win-overlay').style.display = "none";
-        initGame();
-    } else {
-        alert("مبروك! ختمت اللعبة بالكامل.");
-        location.reload();
-    }
+function updateCoins() {
+    document.getElementById('coins-map').innerText = coins;
+    document.getElementById('coins-game').innerText = coins;
 }
 
-function useHint() {
-    if (coins >= 20) {
-        const level = gameData[currentLevel];
-        alert(`تلميح: يبدأ بـ (${level.a[0]})`);
-        coins -= 20;
-        document.getElementById('coin-count').innerText = coins;
-    }
-}
-
-window.onload = initGame;
+window.onload = renderMap;
