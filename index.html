@@ -1,65 +1,21 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GeoQuest | غزو العالم</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Readex+Pro:wght@300;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة الجغرافي</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <header class="game-hud">
-            <div class="player-rank">
-                <div class="rank-icon" id="rank-icon">🎖️</div>
-                <div class="rank-details">
-                    <span id="player-title">مستكشف مبتدئ</span>
-                    <div class="xp-bar-container"><div id="xp-fill"></div></div>
-                </div>
-            </div>
-            <div class="game-currency">
-                <span id="gold-count">0</span> <i class="fas fa-coins"></i>
-            </div>
-        </header>
-
-        <main class="game-viewport">
-            <section class="view active" id="world-map-view">
-                <div id="map"></div>
-                <div class="map-overlay">
-                    <button class="action-btn scan-btn" onclick="toggleSatellite()"><i class="fas fa-satellite-dish"></i> مسح الرادار</button>
-                </div>
-            </section>
-
-            <section class="view" id="battle-view">
-                <div class="quiz-engine">
-                    <div class="difficulty-indicator">صعوبة المستوى: <span id="diff-level">1</span></div>
-                    <div class="q-card" id="q-card">
-                        <h2 id="question-text">استعد للمعركة...</h2>
-                        <div class="options-container" id="options"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="view" id="war-room-view">
-                <div class="war-selector">
-                    <select id="war-c1" onchange="startComparison()"></select>
-                    <div class="vs-circle">VS</div>
-                    <select id="war-c2" onchange="startComparison()"></select>
-                </div>
-                <div id="battle-stats-grid" class="battle-grid"></div>
-            </section>
-        </main>
-
-        <nav class="nav-control">
-            <button class="nav-tab active" onclick="switchView('world-map-view')"><i class="fas fa-globe"></i></button>
-            <button class="nav-tab" onclick="switchView('battle-view')"><i class="fas fa-crosshairs"></i></button>
-            <button class="nav-tab" onclick="switchView('war-room-view')"><i class="fas fa-shield-alt"></i></button>
-        </nav>
+    <div id="game-container">
+        <div id="category-tag" style="color: #636e72; font-weight: bold;"></div>
+        <h2 id="question-text">جاري التحميل...</h2>
+        
+        <div class="answer-slots"></div>
+        <div class="letters-grid"></div>
+        
+        <button onclick="location.reload()" style="margin-top: 20px; border: none; background: none; color: #0984e3; cursor: pointer;">تلميح 💡</button>
     </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
