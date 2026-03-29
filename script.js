@@ -1,3 +1,4 @@
+// ==================== البيانات العامة ====================
 let questionsData = [];
 let countriesData = [];
 let currentQuestions = [];
@@ -8,6 +9,7 @@ let currentCategory = "الكل";
 let mainMap, currentMarker;
 let compareChart = null;
 
+// حقائق سريعة
 const importantFacts = [
     { icon: "fa-water", title: "أعمق نقطة في المحيطات", fact: "خندق ماريانا في المحيط الهادئ، عمقه 11,034 متراً." },
     { icon: "fa-mountain", title: "أعلى قمة جبلية", fact: "قمة إيفرست في الهيمالايا، ارتفاعها 8,848 متراً." },
@@ -19,6 +21,7 @@ const importantFacts = [
     { icon: "fa-water", title: "أطول نهر في العالم", fact: "نهر النيل بطول 6,650 كم." }
 ];
 
+// ==================== تحميل البيانات ====================
 async function loadData() {
     try {
         const [questionsRes, countriesRes] = await Promise.all([
@@ -45,13 +48,13 @@ async function loadData() {
         `;
         
     } catch (error) {
-        console.error('خطأ في تحميل البيانات:', error);
+        console.error('خطأ:', error);
         showToast('حدث خطأ في تحميل البيانات');
     }
 }
 
 function displayFacts() {
-    const container = document.getElementById('factsContainer');
+    const container = document.getElementById('factsGrid');
     container.innerHTML = importantFacts.map(f => `
         <div class="fact-card">
             <i class="fas ${f.icon}"></i>
@@ -61,6 +64,7 @@ function displayFacts() {
     `).join('');
 }
 
+// ==================== إدارة التقدم ====================
 function loadUserProgress() {
     const saved = localStorage.getItem('geoCenter');
     if (saved) {
@@ -81,7 +85,9 @@ function saveUserProgress() {
 function updateStats() {
     const accuracy = totalAnswered === 0 ? 0 : Math.round((correctCount / totalAnswered) * 100);
     const level = Math.floor(score / 100) + 1;
-    const rank = level <= 2 ? "🌱 مستكشف" : level <= 4 ? "📚 خبير جغرافي" : "🏆 أستاذ جغرافيا";
+    let rank = "🌱 مستكشف";
+    if (level >= 3) rank = "📚 خبير جغرافي";
+    if (level >= 5) rank = "🏆 أستاذ جغرافيا";
     
     document.getElementById('homeScore').innerText = score;
     document.getElementById('homeCorrect').innerText = correctCount;
@@ -97,8 +103,8 @@ function updateStats() {
     saveUserProgress();
 }
 
-function resetProgress() {
-    if (confirm('⚠️ هل أنت متأكد من إعادة تعيين كل التقدم؟ لا يمكن التراجع!'))) {
+window.resetProgress = function() {
+    if (confirm('⚠️ هل أنت متأكد من إعادة تعيين كل التقدم؟')) {
         score = 0;
         correctCount = 0;
         maxStreak = 0;
@@ -107,9 +113,10 @@ function resetProgress() {
         updateStats();
         showToast('✨ تم إعادة تعيين التقدم بنجاح');
     }
-}
+};
 
-function changeCategory() {
+// ==================== نظام الأسئلة ====================
+window.changeCategory = function() {
     const categories = ["الكل", "عواصم", "معالم", "أنهار", "جبال", "دول", "جغرافيا"];
     let idx = categories.indexOf(currentCategory);
     idx = (idx + 1) % categories.length;
@@ -122,11 +129,11 @@ function changeCategory() {
         if (currentQuestions.length === 0) currentQuestions = [...questionsData];
     }
     
-    document.getElementById('currentCategoryName').innerHTML = currentCategory;
+    document.getElementById('currentCategory').innerHTML = currentCategory;
     currentQIndex = 0;
     loadQuestion();
     showToast(`📂 تم التبديل إلى فئة: ${currentCategory}`);
-}
+};
 
 function loadQuestion() {
     if (timerInterval) clearInterval(timerInterval);
@@ -205,11 +212,12 @@ function handleTimeout() {
     updateStats();
 }
 
-function nextQuestion() {
+window.nextQuestion = function() {
     currentQIndex = (currentQIndex + 1) % currentQuestions.length;
     loadQuestion();
-}
+};
 
+// ==================== المقارنة ====================
 function populateSelects() {
     const sel1 = document.getElementById('country1');
     const sel2 = document.getElementById('country2');
@@ -227,7 +235,7 @@ function populateSelects() {
     });
 }
 
-function compareCountries() {
+window.compareCountries = function() {
     const name1 = document.getElementById('country1').value;
     const name2 = document.getElementById('country2').value;
     
@@ -243,7 +251,7 @@ function compareCountries() {
     if (!c1 || !c2) return;
     
     document.getElementById('compareResult').innerHTML = `
-        <div class="country-compare-card">
+        <div class="compare-card">
             <div class="flag">${c1.flag}</div>
             <h3>${c1.name}</h3>
             <p><i class="fas fa-language"></i> اللغة: ${c1.officialLanguage}</p>
@@ -255,7 +263,7 @@ function compareCountries() {
             <p><i class="fas fa-money-bill"></i> العملة: ${c1.currency}</p>
             <p><i class="fas fa-shield-alt"></i> التصنيف: ${c1.militaryRank}</p>
         </div>
-        <div class="country-compare-card">
+        <div class="compare-card">
             <div class="flag">${c2.flag}</div>
             <h3>${c2.name}</h3>
             <p><i class="fas fa-language"></i> اللغة: ${c2.officialLanguage}</p>
@@ -277,7 +285,7 @@ function compareCountries() {
         data: {
             labels: ['عدد السكان (مليون)', 'المساحة (ألف كم²)'],
             datasets: [
-                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#ff3366', borderRadius: 10 },
+                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#ff6b35', borderRadius: 10 },
                 { label: c2.name, data: [c2.population / 1e6, c2.area / 1e3], backgroundColor: '#00d2ff', borderRadius: 10 }
             ]
         },
@@ -293,8 +301,9 @@ function compareCountries() {
             }
         }
     });
-}
+};
 
+// ==================== الخريطة ====================
 function initMap() {
     if (mainMap) return;
     mainMap = L.map('map').setView([23.5, 40], 3);
@@ -311,7 +320,7 @@ function initMap() {
     });
 }
 
-function changeLayer(type) {
+window.changeLayer = function(type) {
     if (!mainMap) return;
     mainMap.eachLayer(layer => {
         if (layer._url) mainMap.removeLayer(layer);
@@ -322,9 +331,9 @@ function changeLayer(type) {
         : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
     
     L.tileLayer(url, { attribution: '© OpenStreetMap' }).addTo(mainMap);
-}
+};
 
-async function searchLocation() {
+window.searchLocation = async function() {
     const query = document.getElementById('searchInput').value.trim();
     if (!query) return;
     
@@ -343,40 +352,47 @@ async function searchLocation() {
     } catch (e) {
         showToast('⚠️ حدث خطأ في البحث');
     }
-}
+};
 
-function navigateTo(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+// ==================== التنقل ====================
+window.navigateTo = function(pageId) {
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    document.querySelectorAll('.nav-link').forEach(btn => {
+        btn.classList.remove('active');
+    });
     
-    document.getElementById(`${sectionId}-section`).classList.add('active');
-    document.querySelector(`.nav-btn[data-section="${sectionId}"]`).classList.add('active');
+    document.getElementById(pageId).classList.add('active');
+    document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
     
-    if (sectionId === 'maps') {
+    if (pageId === 'maps') {
         if (mainMap) mainMap.invalidateSize();
         else initMap();
     }
-    if (sectionId === 'quiz' && currentQuestions.length && !quizActive) {
+    if (pageId === 'quiz' && currentQuestions.length && !quizActive) {
         loadQuestion();
     }
-    if (sectionId === 'compare') {
+    if (pageId === 'compare') {
         compareCountries();
     }
-}
+};
 
 function showToast(msg) {
     const toast = document.createElement('div');
-    toast.className = 'toast-message';
+    toast.className = 'toast-msg';
     toast.innerText = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
 }
 
-document.querySelectorAll('.nav-btn').forEach(btn => {
+// ربط أزرار التنقل
+document.querySelectorAll('.nav-link').forEach(btn => {
     btn.addEventListener('click', () => {
-        navigateTo(btn.dataset.section);
+        navigateTo(btn.dataset.page);
     });
 });
 
+// ==================== تشغيل التطبيق ====================
 loadData();
 setTimeout(() => initMap(), 500);
