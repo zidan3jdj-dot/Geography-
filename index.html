@@ -2,72 +2,67 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoPro | المنصة الجغرافية الاحترافية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Readex+Pro:wght@300;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GeoPro Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <nav class="sidebar">
-            <div class="logo">
-                <i class="fas fa-globe-americas"></i>
-                <span>Geo<span>Pro</span></span>
+    <div class="mobile-wrapper">
+        <header class="app-header">
+            <div class="status-bar">
+                <span class="logo">Geo<span>Pro</span></span>
+                <div class="user-info"><span id="total-score">0</span> <i class="fas fa-star"></i></div>
             </div>
-            <ul class="nav-menu">
-                <li class="nav-item active" data-page="home"><i class="fas fa-th-large"></i> الرئيسية</li>
-                <li class="nav-item" data-page="maps"><i class="fas fa-map-marked-alt"></i> الخرائط</li>
-                <li class="nav-item" data-page="quiz"><i class="fas fa-vial"></i> التحدي</li>
-                <li class="nav-item" data-page="compare"><i class="fas fa-chart-pie"></i> المقارنة</li>
-                <li class="nav-item" data-page="stats"><i class="fas fa-user-shield"></i> الإنجازات</li>
-            </ul>
-        </nav>
+        </header>
 
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="ابحث عن دولة أو معلم...">
-                </div>
-                <div class="user-profile">
-                    <div class="stats-badge">🔥 <span id="streak-val">0</span></div>
-                    <img src="https://ui-avatars.com/api/?name=User&background=38bdf8&color=fff" alt="Profile">
-                </div>
-            </header>
-
-            <section id="pages-container">
-                <div class="page active" id="home">
-                    <div class="hero-section">
-                        <h1>استكشف العالم بدقة <span class="gradient-text">الاحترافين</span></h1>
-                        <p>منصة جغرافية متكاملة لتحليل البيانات واستكشاف القارات.</p>
-                    </div>
-                    <div class="grid-layout" id="continents-grid">
-                        </div>
-                </div>
-
-                <div class="page" id="maps">
-                    <div class="map-wrapper">
-                        <div id="mainMap"></div>
-                    </div>
-                </div>
-
-                <div class="page" id="quiz">
-                    <div class="quiz-container">
-                        <div class="quiz-header">
-                            <div class="timer-bar"><div id="timer-progress"></div></div>
-                            <h2 id="question-text">محمل الأسئلة...</h2>
-                        </div>
-                        <div class="options-grid" id="options-container"></div>
-                    </div>
+        <main id="app-content">
+            <section class="page active" id="maps">
+                <div id="mainMap"></div>
+                <div class="map-controls">
+                    <button onclick="toggleMapLayer()" id="layerBtn"><i class="fas fa-satellite"></i></button>
                 </div>
             </section>
+
+            <section class="page" id="quiz">
+                <div class="quiz-card">
+                    <div class="progress-container"><div id="progress-bar"></div></div>
+                    <h2 id="question-text">اضغط لبدء التحدي</h2>
+                    <div id="options-container" class="options-list"></div>
+                    <button class="start-btn" onclick="startQuiz()">ابدأ الآن</button>
+                </div>
+            </section>
+
+            <section class="page" id="compare">
+                <div class="compare-header"><h3>مقارنة الدول</h3></div>
+                <div class="selection-area">
+                    <select id="country1" onchange="compareData()"></select>
+                    <span>VS</span>
+                    <select id="country2" onchange="compareData()"></select>
+                </div>
+                <div id="compare-result" class="result-cards"></div>
+            </section>
+
+            <section class="page" id="stats">
+                <div class="stats-grid">
+                    <div class="stat-box"><h3>الرتبة</h3><p id="rank">مبتدئ</p></div>
+                    <div class="stat-box"><h3>الدقة</h3><p id="accuracy">0%</p></div>
+                </div>
+                <ul id="achievements-list" class="ach-list"></ul>
+            </section>
         </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('maps')"><i class="fas fa-map"></i><span>الخريطة</span></div>
+            <div class="nav-item" onclick="showPage('quiz')"><i class="fas fa-gamepad"></i><span>تحدي</span></div>
+            <div class="nav-item" onclick="showPage('compare')"><i class="fas fa-columns"></i><span>مقارنة</span></div>
+            <div class="nav-item" onclick="showPage('stats')"><i class="fas fa-trophy"></i><span>إنجازات</span></div>
+        </nav>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
