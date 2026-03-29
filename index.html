@@ -3,66 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GeoExpert Pro | الدكتور الجغرافي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>GeoQuest | غزو العالم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Readex+Pro:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-shell">
-        <header class="main-header">
-            <div class="top-row">
-                <span class="brand">Geo<span>Expert</span></span>
-                <div class="score-pill"><i class="fas fa-award"></i> <span id="score">0</span></div>
+    <div class="game-container">
+        <header class="game-hud">
+            <div class="player-rank">
+                <div class="rank-icon" id="rank-icon">🎖️</div>
+                <div class="rank-details">
+                    <span id="player-title">مستكشف مبتدئ</span>
+                    <div class="xp-bar-container"><div id="xp-fill"></div></div>
+                </div>
+            </div>
+            <div class="game-currency">
+                <span id="gold-count">0</span> <i class="fas fa-coins"></i>
             </div>
         </header>
 
-        <main id="app-viewport">
-            <section class="view active" id="map-view">
+        <main class="game-viewport">
+            <section class="view active" id="world-map-view">
                 <div id="map"></div>
-                <div class="map-overlay-tools">
-                    <button class="tool-btn" onclick="switchLayer('sat')"><i class="fas fa-satellite"></i></button>
-                    <button class="tool-btn" onclick="switchLayer('street')"><i class="fas fa-road"></i></button>
+                <div class="map-overlay">
+                    <button class="action-btn scan-btn" onclick="toggleSatellite()"><i class="fas fa-satellite-dish"></i> مسح الرادار</button>
                 </div>
             </section>
 
-            <section class="view" id="quiz-view">
-                <div class="quiz-container">
-                    <div class="quiz-categories" id="cat-filters">
-                        <button class="cat-pill active" onclick="setCategory('عواصم')">عواصم</button>
-                        <button class="cat-pill" onclick="setCategory('أنهار')">أنهار</button>
-                        <button class="cat-pill" onclick="setCategory('جبال')">جبال</button>
-                    </div>
-                    <div class="question-card">
-                        <div class="q-header">
-                            <span id="q-category-label">عواصم</span>
-                            <div class="q-timer">15s</div>
-                        </div>
-                        <h2 id="q-text">اختر فئة وابدأ التحدي</h2>
-                        <div id="options-grid" class="options-grid"></div>
+            <section class="view" id="battle-view">
+                <div class="quiz-engine">
+                    <div class="difficulty-indicator">صعوبة المستوى: <span id="diff-level">1</span></div>
+                    <div class="q-card" id="q-card">
+                        <h2 id="question-text">استعد للمعركة...</h2>
+                        <div class="options-container" id="options"></div>
                     </div>
                 </div>
             </section>
 
-            <section class="view" id="compare-view">
-                <div class="compare-box">
-                    <div class="selector-row">
-                        <select id="c1" onchange="performGlobalCompare()"></select>
-                        <span class="vs-badge">VS</span>
-                        <select id="c2" onchange="performGlobalCompare()"></select>
-                    </div>
-                    <div id="compare-results-grid" class="compare-results">
-                        <div class="empty-state">اختر دولتين لبدء المقارنة العسكرية والاقتصادية</div>
-                    </div>
+            <section class="view" id="war-room-view">
+                <div class="war-selector">
+                    <select id="war-c1" onchange="startComparison()"></select>
+                    <div class="vs-circle">VS</div>
+                    <select id="war-c2" onchange="startComparison()"></select>
                 </div>
+                <div id="battle-stats-grid" class="battle-grid"></div>
             </section>
         </main>
 
-        <nav class="tab-bar">
-            <button class="tab-item active" onclick="nav('map-view')"><i class="fas fa-map-marked-alt"></i><span>خريطة</span></button>
-            <button class="tab-item" onclick="nav('quiz-view')"><i class="fas fa-brain"></i><span>تحدي</span></button>
-            <button class="tab-item" onclick="nav('compare-view')"><i class="fas fa-balance-scale"></i><span>مقارنة</span></button>
+        <nav class="nav-control">
+            <button class="nav-tab active" onclick="switchView('world-map-view')"><i class="fas fa-globe"></i></button>
+            <button class="nav-tab" onclick="switchView('battle-view')"><i class="fas fa-crosshairs"></i></button>
+            <button class="nav-tab" onclick="switchView('war-room-view')"><i class="fas fa-shield-alt"></i></button>
         </nav>
     </div>
 
