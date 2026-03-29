@@ -1,21 +1,55 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الجغرافي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الجغرافي - كلمات كراش</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="game-container">
-        <div id="category-tag" style="color: #636e72; font-weight: bold;"></div>
-        <h2 id="question-text">جاري التحميل...</h2>
-        
-        <div class="answer-slots"></div>
-        <div class="letters-grid"></div>
-        
-        <button onclick="location.reload()" style="margin-top: 20px; border: none; background: none; color: #0984e3; cursor: pointer;">تلميح 💡</button>
+
+    <div class="app-container">
+        <div class="top-bar">
+            <div class="settings-icon">⚙️</div>
+            <div class="coins-display">
+                <span id="coin-count">1103</span>
+                <div class="coin-img">💰</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="level-info">
+                <span id="level-number">مرحلة 1</span>
+                <div id="category-badge">تضاريس</div>
+            </div>
+
+            <div class="question-card">
+                <div id="question-text">ما هو الجبل الأعلى في أفريقيا؟</div>
+            </div>
+
+            <div class="answer-section" id="answer-slots">
+                </div>
+
+            <div class="letters-grid" id="letters-grid">
+                </div>
+        </div>
+
+        <div class="footer-controls">
+            <button class="control-btn hint-btn" onclick="useHint()">تلميح (20 💰)</button>
+            <button class="control-btn clear-btn" onclick="clearCurrentAnswer()">مسح</button>
+        </div>
     </div>
+
+    <div id="win-overlay" class="overlay">
+        <div class="win-card">
+            <h2>رائع! 🎉</h2>
+            <p>لقد ربحت 20 قطعة ذهبية</p>
+            <div class="win-coins">💰 +20</div>
+            <button class="next-btn" onclick="nextLevel()">المرحلة التالية</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
