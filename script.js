@@ -1,4 +1,3 @@
-// ==================== المتغيرات العامة ====================
 let questionsData = [];
 let countriesData = [];
 let currentQuestions = [];
@@ -9,7 +8,6 @@ let currentCategory = "الكل";
 let mainMap, currentMarker;
 let compareChart = null;
 
-// الحقائق الجغرافية المهمة
 const importantFacts = [
     { icon: "fa-water", title: "أعمق نقطة في المحيطات", fact: "خندق ماريانا في المحيط الهادئ، عمقه 11,034 متراً." },
     { icon: "fa-mountain", title: "أعلى قمة جبلية", fact: "قمة إيفرست في الهيمالايا، ارتفاعها 8,848 متراً." },
@@ -21,7 +19,6 @@ const importantFacts = [
     { icon: "fa-water", title: "أطول نهر في العالم", fact: "نهر النيل بطول 6,650 كم." }
 ];
 
-// ==================== تحميل البيانات ====================
 async function loadData() {
     try {
         const [questionsRes, countriesRes] = await Promise.all([
@@ -32,7 +29,6 @@ async function loadData() {
         questionsData = await questionsRes.json();
         countriesData = await countriesRes.json();
         
-        // تهيئة البيانات
         currentQuestions = [...questionsData];
         populateSelects();
         displayFacts();
@@ -40,11 +36,12 @@ async function loadData() {
         updateStats();
         
         document.getElementById('quickInfo').innerHTML = `
-            🌍 عدد دول العالم: <strong>195 دولة</strong> معترف بها<br>
-            🗺️ أكبر دولة مساحة: <strong>روسيا</strong> (17.1 مليون كم²)<br>
-            👥 أكثر دولة سكاناً: <strong>الهند</strong> (1.4 مليار نسمة)<br>
-            🏔️ أعلى قمة: <strong>إيفرست</strong> (8848 م)<br>
-            🌊 أعمق نقطة: <strong>خندق ماريانا</strong> (11034 م)
+            <p><i class="fas fa-globe"></i> عدد دول العالم: <strong>195 دولة</strong></p>
+            <p><i class="fas fa-ruler-combined"></i> أكبر دولة مساحة: <strong>روسيا</strong> (17.1 مليون كم²)</p>
+            <p><i class="fas fa-users"></i> أكثر دولة سكاناً: <strong>الهند</strong> (1.4 مليار)</p>
+            <p><i class="fas fa-mountain"></i> أعلى قمة: <strong>إيفرست</strong> (8848 م)</p>
+            <p><i class="fas fa-water"></i> أعمق نقطة: <strong>خندق ماريانا</strong> (11034 م)</p>
+            <p><i class="fas fa-money-bill"></i> أقوى عملة: <strong>دينار كويتي</strong></p>
         `;
         
     } catch (error) {
@@ -53,7 +50,6 @@ async function loadData() {
     }
 }
 
-// ==================== عرض الحقائق ====================
 function displayFacts() {
     const container = document.getElementById('factsContainer');
     container.innerHTML = importantFacts.map(f => `
@@ -65,7 +61,6 @@ function displayFacts() {
     `).join('');
 }
 
-// ==================== إدارة المستخدم ====================
 function loadUserProgress() {
     const saved = localStorage.getItem('geoCenter');
     if (saved) {
@@ -86,7 +81,7 @@ function saveUserProgress() {
 function updateStats() {
     const accuracy = totalAnswered === 0 ? 0 : Math.round((correctCount / totalAnswered) * 100);
     const level = Math.floor(score / 100) + 1;
-    const rank = level <= 2 ? "مستكشف" : level <= 4 ? "خبير جغرافي" : "أستاذ جغرافيا";
+    const rank = level <= 2 ? "🌱 مستكشف" : level <= 4 ? "📚 خبير جغرافي" : "🏆 أستاذ جغرافيا";
     
     document.getElementById('homeScore').innerText = score;
     document.getElementById('homeCorrect').innerText = correctCount;
@@ -97,26 +92,25 @@ function updateStats() {
     document.getElementById('statCorrect').innerText = correctCount;
     document.getElementById('statStreak').innerText = maxStreak;
     document.getElementById('statAccuracy').innerText = accuracy + "%";
-    document.getElementById('statRank').innerText = rank;
+    document.getElementById('statRank').innerHTML = rank;
     
     saveUserProgress();
 }
 
 function resetProgress() {
-    if (confirm('هل أنت متأكد من إعادة تعيين كل التقدم؟')) {
+    if (confirm('⚠️ هل أنت متأكد من إعادة تعيين كل التقدم؟ لا يمكن التراجع!'))) {
         score = 0;
         correctCount = 0;
         maxStreak = 0;
         totalAnswered = 0;
         streak = 0;
         updateStats();
-        showToast('تم إعادة تعيين التقدم بنجاح');
+        showToast('✨ تم إعادة تعيين التقدم بنجاح');
     }
 }
 
-// ==================== نظام الأسئلة ====================
 function changeCategory() {
-    const categories = ["الكل", "عواصم", "معالم", "أنهار", "جبال", "دول", "جغرافيا طبيعية"];
+    const categories = ["الكل", "عواصم", "معالم", "أنهار", "جبال", "دول", "جغرافيا"];
     let idx = categories.indexOf(currentCategory);
     idx = (idx + 1) % categories.length;
     currentCategory = categories[idx];
@@ -128,10 +122,10 @@ function changeCategory() {
         if (currentQuestions.length === 0) currentQuestions = [...questionsData];
     }
     
-    document.getElementById('currentCategoryName').innerText = currentCategory;
+    document.getElementById('currentCategoryName').innerHTML = currentCategory;
     currentQIndex = 0;
     loadQuestion();
-    showToast(`تم التبديل إلى فئة: ${currentCategory}`);
+    showToast(`📂 تم التبديل إلى فئة: ${currentCategory}`);
 }
 
 function loadQuestion() {
@@ -188,12 +182,12 @@ function checkAnswer(selected, correct, btn) {
         streak++;
         totalAnswered++;
         if (streak > maxStreak) maxStreak = streak;
-        document.getElementById('quizFeedback').innerHTML = `<span style="color: #81c784;">✅ صحيح! +${points} نقطة (سلسلة ${streak})</span>`;
+        document.getElementById('quizFeedback').innerHTML = `<span style="color: #00e676;">✅ صحيح! +${points} نقطة (سلسلة ${streak})</span>`;
     } else {
         btn.classList.add('wrong');
         allBtns[correct].classList.add('correct');
         streak = 0;
-        document.getElementById('quizFeedback').innerHTML = `<span style="color: #ef9a9a;">❌ خطأ! الإجابة الصحيحة: ${q.a[correct]}</span>`;
+        document.getElementById('quizFeedback').innerHTML = `<span style="color: #ff5252;">❌ خطأ! الإجابة الصحيحة: ${q.a[correct]}</span>`;
     }
     
     updateStats();
@@ -204,7 +198,7 @@ function handleTimeout() {
     quizActive = false;
     streak = 0;
     const q = currentQuestions[currentQIndex];
-    document.getElementById('quizFeedback').innerHTML = `<span style="color: #d4a373;">⏰ انتهى الوقت! الإجابة: ${q.a[q.c]}</span>`;
+    document.getElementById('quizFeedback').innerHTML = `<span style="color: #ffab00;">⏰ انتهى الوقت! الإجابة: ${q.a[q.c]}</span>`;
     document.getElementById('nextBtn').style.display = 'block';
     const allBtns = document.querySelectorAll('#answers .answer-btn');
     allBtns.forEach(b => b.style.pointerEvents = 'none');
@@ -216,13 +210,12 @@ function nextQuestion() {
     loadQuestion();
 }
 
-// ==================== المقارنة الشاملة ====================
 function populateSelects() {
     const sel1 = document.getElementById('country1');
     const sel2 = document.getElementById('country2');
     
-    sel1.innerHTML = '<option value="">اختر دولة</option>';
-    sel2.innerHTML = '<option value="">اختر دولة</option>';
+    sel1.innerHTML = '<option value="">🔍 اختر دولة</option>';
+    sel2.innerHTML = '<option value="">🔍 اختر دولة</option>';
     
     countriesData.forEach(c => {
         const opt1 = document.createElement('option');
@@ -234,31 +227,12 @@ function populateSelects() {
     });
 }
 
-function filterCountries(selectNum) {
-    const searchTerm = document.getElementById(`searchCountry${selectNum}`).value.trim().toLowerCase();
-    const filtered = countriesData.filter(c => c.name.toLowerCase().includes(searchTerm));
-    const select = document.getElementById(`country${selectNum}`);
-    const currentValue = select.value;
-    
-    select.innerHTML = '<option value="">اختر دولة</option>';
-    filtered.forEach(c => {
-        const option = document.createElement('option');
-        option.value = c.name;
-        option.innerText = `${c.flag} ${c.name}`;
-        select.appendChild(option);
-    });
-    
-    if (currentValue && filtered.some(c => c.name === currentValue)) {
-        select.value = currentValue;
-    }
-}
-
 function compareCountries() {
     const name1 = document.getElementById('country1').value;
     const name2 = document.getElementById('country2').value;
     
     if (!name1 || !name2 || name1 === name2) {
-        document.getElementById('compareResult').innerHTML = '<p style="text-align: center; grid-column: span 2;">⚠️ يرجى اختيار دولتين مختلفتين للمقارنة</p>';
+        document.getElementById('compareResult').innerHTML = '<p style="text-align: center; padding: 40px;">⚠️ يرجى اختيار دولتين مختلفتين للمقارنة</p>';
         if (compareChart) compareChart.destroy();
         return;
     }
@@ -269,29 +243,29 @@ function compareCountries() {
     if (!c1 || !c2) return;
     
     document.getElementById('compareResult').innerHTML = `
-        <div class="country-card">
-            <div class="country-flag">${c1.flag}</div>
+        <div class="country-compare-card">
+            <div class="flag">${c1.flag}</div>
             <h3>${c1.name}</h3>
-            <p><i class="fas fa-language"></i> اللغة الرسمية: ${c1.officialLanguage || 'غير محدد'}</p>
-            <p><i class="fas fa-mosque"></i> الدين الرسمي: ${c1.officialReligion || 'غير محدد'}</p>
-            <p><i class="fas fa-gavel"></i> نظام الحكم: ${c1.government || 'غير محدد'}</p>
+            <p><i class="fas fa-language"></i> اللغة: ${c1.officialLanguage}</p>
+            <p><i class="fas fa-mosque"></i> الدين: ${c1.officialReligion}</p>
+            <p><i class="fas fa-gavel"></i> الحكم: ${c1.government}</p>
             <p><i class="fas fa-city"></i> العاصمة: ${c1.capital}</p>
-            <p><i class="fas fa-users"></i> عدد السكان: ${(c1.population / 1e6).toFixed(1)} مليون نسمة</p>
+            <p><i class="fas fa-users"></i> السكان: ${(c1.population / 1e6).toFixed(1)} مليون</p>
             <p><i class="fas fa-globe"></i> المساحة: ${(c1.area / 1e3).toFixed(0)} ألف كم²</p>
             <p><i class="fas fa-money-bill"></i> العملة: ${c1.currency}</p>
-            <p><i class="fas fa-shield-alt"></i> التقييم العسكري: ${c1.militaryRank || 'غير محدد'}</p>
+            <p><i class="fas fa-shield-alt"></i> التصنيف: ${c1.militaryRank}</p>
         </div>
-        <div class="country-card">
-            <div class="country-flag">${c2.flag}</div>
+        <div class="country-compare-card">
+            <div class="flag">${c2.flag}</div>
             <h3>${c2.name}</h3>
-            <p><i class="fas fa-language"></i> اللغة الرسمية: ${c2.officialLanguage || 'غير محدد'}</p>
-            <p><i class="fas fa-mosque"></i> الدين الرسمي: ${c2.officialReligion || 'غير محدد'}</p>
-            <p><i class="fas fa-gavel"></i> نظام الحكم: ${c2.government || 'غير محدد'}</p>
+            <p><i class="fas fa-language"></i> اللغة: ${c2.officialLanguage}</p>
+            <p><i class="fas fa-mosque"></i> الدين: ${c2.officialReligion}</p>
+            <p><i class="fas fa-gavel"></i> الحكم: ${c2.government}</p>
             <p><i class="fas fa-city"></i> العاصمة: ${c2.capital}</p>
-            <p><i class="fas fa-users"></i> عدد السكان: ${(c2.population / 1e6).toFixed(1)} مليون نسمة</p>
+            <p><i class="fas fa-users"></i> السكان: ${(c2.population / 1e6).toFixed(1)} مليون</p>
             <p><i class="fas fa-globe"></i> المساحة: ${(c2.area / 1e3).toFixed(0)} ألف كم²</p>
             <p><i class="fas fa-money-bill"></i> العملة: ${c2.currency}</p>
-            <p><i class="fas fa-shield-alt"></i> التقييم العسكري: ${c2.militaryRank || 'غير محدد'}</p>
+            <p><i class="fas fa-shield-alt"></i> التصنيف: ${c2.militaryRank}</p>
         </div>
     `;
     
@@ -303,21 +277,24 @@ function compareCountries() {
         data: {
             labels: ['عدد السكان (مليون)', 'المساحة (ألف كم²)'],
             datasets: [
-                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#d4a373' },
-                { label: c2.name, data: [c2.population / 1e6, c2.area / 1e3], backgroundColor: '#6b8c5c' }
+                { label: c1.name, data: [c1.population / 1e6, c1.area / 1e3], backgroundColor: '#ff3366', borderRadius: 10 },
+                { label: c2.name, data: [c2.population / 1e6, c2.area / 1e3], backgroundColor: '#00d2ff', borderRadius: 10 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { labels: { color: '#f5e6d3' } }
+                legend: { labels: { color: '#ffffff' } }
+            },
+            scales: {
+                y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
             }
         }
     });
 }
 
-// ==================== الخرائط ====================
 function initMap() {
     if (mainMap) return;
     mainMap = L.map('map').setView([23.5, 40], 3);
@@ -327,7 +304,7 @@ function initMap() {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`);
             const data = await res.json();
-            document.getElementById('mapInfo').innerHTML = `<i class="fas fa-location-dot"></i> ${data.display_name || 'منطقة جغرافية'} (${e.latlng.lat.toFixed(2)}, ${e.latlng.lng.toFixed(2)})`;
+            document.getElementById('mapInfo').innerHTML = `<i class="fas fa-location-dot"></i> ${data.display_name || 'منطقة جغرافية'}`;
         } catch (err) {
             document.getElementById('mapInfo').innerHTML = `<i class="fas fa-location-dot"></i> ${e.latlng.lat.toFixed(2)}, ${e.latlng.lng.toFixed(2)}`;
         }
@@ -340,16 +317,11 @@ function changeLayer(type) {
         if (layer._url) mainMap.removeLayer(layer);
     });
     
-    let url = '';
-    if (type === 'street') {
-        url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    } else if (type === 'satellite') {
-        url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-    }
+    let url = type === 'street' 
+        ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
     
-    if (url) {
-        L.tileLayer(url, { attribution: '© OpenStreetMap' }).addTo(mainMap);
-    }
+    L.tileLayer(url, { attribution: '© OpenStreetMap' }).addTo(mainMap);
 }
 
 async function searchLocation() {
@@ -361,44 +333,50 @@ async function searchLocation() {
         const data = await res.json();
         if (data.length) {
             const { lat, lon, display_name } = data[0];
-            mainMap.flyTo([lat, lon], 8);
+            mainMap.flyTo([lat, lon], 10);
             if (currentMarker) mainMap.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(mainMap).bindPopup(display_name).openPopup();
             document.getElementById('mapInfo').innerHTML = `<i class="fas fa-search"></i> ${display_name}`;
         } else {
-            showToast('لم يتم العثور على الموقع');
+            showToast('❌ لم يتم العثور على الموقع');
         }
     } catch (e) {
-        showToast('حدث خطأ في البحث');
+        showToast('⚠️ حدث خطأ في البحث');
     }
 }
 
-// ==================== التنقل والإشعارات ====================
 function navigateTo(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
     
-    document.getElementById(sectionId).classList.add('active');
-    document.getElementById(`nav-${sectionId}`).classList.add('active');
+    document.getElementById(`${sectionId}-section`).classList.add('active');
+    document.querySelector(`.nav-btn[data-section="${sectionId}"]`).classList.add('active');
     
     if (sectionId === 'maps') {
         if (mainMap) mainMap.invalidateSize();
         else initMap();
     }
-    if (sectionId === 'quiz' && currentQuestions.length) {
-        if (!quizActive) loadQuestion();
+    if (sectionId === 'quiz' && currentQuestions.length && !quizActive) {
+        loadQuestion();
     }
-    if (sectionId === 'compare') compareCountries();
+    if (sectionId === 'compare') {
+        compareCountries();
+    }
 }
 
 function showToast(msg) {
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = 'toast-message';
     toast.innerText = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
 }
 
-// ==================== تشغيل التطبيق ====================
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        navigateTo(btn.dataset.section);
+    });
+});
+
 loadData();
 setTimeout(() => initMap(), 500);
