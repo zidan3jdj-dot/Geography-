@@ -1,74 +1,113 @@
-const GeoApp = {
-    state: {
-        score: 0,
-        streak: 0,
-        currentPage: 'home',
-        questions: []
-    },
+let questions = [];
+let countries = [];
+let currentQuizIndex = 0;
+let userScore = 0;
+let map, satelliteLayer, normalLayer;
 
-    init() {
-        this.bindEvents();
-        this.loadInitialData();
-        console.log("GeoPro System Initialized...");
-    },
+// 1. إدارة التنقل
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    
+    document.getElementById(pageId).classList.add('active');
+    event.currentTarget.classList.add('active');
 
-    bindEvents() {
-        // التنقل بين الصفحات
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const page = e.currentTarget.dataset.page;
-                this.navigateTo(page);
-            });
-        });
-    },
+    if(pageId === 'maps') setTimeout(() => map.invalidateSize(), 200);
+}
 
-    navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.add('active');
-            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
-        }
+// 2. إدارة الخريطة (المنظور الطبيعي والقمر الصناعي)
+function initMap() {
+    map = L.map('mainMap').setView([26.8, 30.8], 5);
+    
+    normalLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+}
 
-        if (pageId === 'maps') this.initMap();
-    },
-
-    async loadInitialData() {
-        try {
-            const response = await fetch('questions.json');
-            this.state.questions = await response.json();
-            this.renderContinents();
-        } catch (err) {
-            console.error("Data Load Error:", err);
-        }
-    },
-
-    renderContinents() {
-        const grid = document.getElementById('continents-grid');
-        const continents = [
-            { name: 'آسيا', icon: 'fa-mosque', count: 48 },
-            { name: 'أفريقيا', icon: 'fa-hippo', count: 54 },
-            { name: 'أوروبا', icon: 'fa-euro-sign', count: 44 }
-        ];
-
-        grid.innerHTML = continents.map(c => `
-            <div class="continent-card">
-                <i class="fas ${c.icon} fa-2x" style="color: var(--primary)"></i>
-                <h3 style="margin: 15px 0 10px">${c.name}</h3>
-                <p style="color: var(--text-muted)">تضم ${c.count} دولة مسجلة.</p>
-            </div>
-        `).join('');
-    },
-
-    initMap() {
-        if (this.map) return;
-        this.map = L.map('mainMap').setView([20, 0], 2);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(this.map);
+function toggleMapLayer() {
+    if (map.hasLayer(normalLayer)) {
+        map.removeLayer(normalLayer);
+        map.addLayer(satelliteLayer);
+        document.getElementById('layerBtn').innerHTML = '<i class="fas fa-map"></i>';
+    } else {
+        map.removeLayer(satelliteLayer);
+        map.addLayer(normalLayer);
+        document.getElementById('layerBtn').innerHTML = '<i class="fas fa-satellite"></i>';
     }
-};
+}
 
-document.addEventListener('DOMContentLoaded', () => GeoApp.init());
+// 3. نظام الأسئلة (Quiz System)
+async function startQuiz() {
+    const res = await fetch('questions.json');
+    questions = await res.json();
+    currentQuizIndex = 0;
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = questions[currentQuizIndex];
+    document.getElementById('question-text').innerText = q.q;
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+    
+    q.a.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(index, q.c);
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(selected, correct) {
+    if(selected === correct) {
+        userScore += 10;
+        document.getElementById('total-score').innerText = userScore;
+    }
+    currentQuizIndex++;
+    if(currentQuizIndex < questions.length) {
+        setTimeout(showQuestion, 1000);
+    } else {
+        document.getElementById('question-text').innerText = "انتهى التحدي!";
+        updateStats();
+    }
+}
+
+// 4. نظام المقارنة
+async function loadCountries() {
+    const res = await fetch('countries.json');
+    countries = await res.json();
+    const s1 = document.getElementById('country1');
+    const s2 = document.getElementById('country2');
+    
+    countries.forEach(c => {
+        const opt = `<option value="${c.name}">${c.flag} ${c.name}</option>`;
+        s1.innerHTML += opt;
+        s2.innerHTML += opt;
+    });
+}
+
+function compareData() {
+    const c1 = countries.find(c => c.name === document.getElementById('country1').value);
+    const c2 = countries.find(c => c.name === document.getElementById('country2').value);
+    
+    document.getElementById('compare-result').innerHTML = `
+        <div class="result-cards" style="display:flex; gap:10px; margin-top:20px;">
+            <div class="card" style="background:#334155; padding:10px; border-radius:10px; flex:1">
+                <h4>${c1.name}</h4>
+                <p>السكان: ${c1.population.toLocaleString()}</p>
+                <p>المساحة: ${c1.area} كم</p>
+            </div>
+            <div class="card" style="background:#334155; padding:10px; border-radius:10px; flex:1">
+                <h4>${c2.name}</h4>
+                <p>السكان: ${c2.population.toLocaleString()}</p>
+                <p>المساحة: ${c2.area} كم</p>
+            </div>
+        </div>
+    `;
+}
+
+// تشغيل عند التحميل
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadCountries();
+});
