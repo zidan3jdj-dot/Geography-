@@ -1,113 +1,107 @@
-let questions = [];
-let countries = [];
-let currentQuizIndex = 0;
-let userScore = 0;
-let map, satelliteLayer, normalLayer;
+let currentScore = localStorage.getItem('geoScore') || 0;
+let countriesData = [];
+let quizCategory = 'عواصم';
+let map, layers = {};
 
-// 1. إدارة التنقل
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    
-    document.getElementById(pageId).classList.add('active');
+// 1. إدارة التنقل وحفظ الحالة
+function nav(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
     event.currentTarget.classList.add('active');
-
-    if(pageId === 'maps') setTimeout(() => map.invalidateSize(), 200);
+    if(viewId === 'map-view') setTimeout(() => map.invalidateSize(), 200);
 }
 
-// 2. إدارة الخريطة (المنظور الطبيعي والقمر الصناعي)
-function initMap() {
-    map = L.map('mainMap').setView([26.8, 30.8], 5);
-    
-    normalLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+// 2. نظام الخريطة الثلاثي
+function initAdvancedMap() {
+    map = L.map('map', { zoomControl: false }).setView([20, 10], 3);
+    layers.street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    layers.sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+    layers.street.addTo(map);
 }
 
-function toggleMapLayer() {
-    if (map.hasLayer(normalLayer)) {
-        map.removeLayer(normalLayer);
-        map.addLayer(satelliteLayer);
-        document.getElementById('layerBtn').innerHTML = '<i class="fas fa-map"></i>';
-    } else {
-        map.removeLayer(satelliteLayer);
-        map.addLayer(normalLayer);
-        document.getElementById('layerBtn').innerHTML = '<i class="fas fa-satellite"></i>';
-    }
+function switchLayer(type) {
+    map.eachLayer(l => map.removeLayer(l));
+    layers[type].addTo(map);
 }
 
-// 3. نظام الأسئلة (Quiz System)
-async function startQuiz() {
+// 3. نظام الأسئلة الاحترافي
+async function loadQuiz() {
     const res = await fetch('questions.json');
-    questions = await res.json();
-    currentQuizIndex = 0;
-    showQuestion();
+    const allQuestions = await res.json();
+    const filtered = allQuestions.filter(q => q.category === quizCategory);
+    renderQuestion(filtered[Math.floor(Math.random() * filtered.length)]);
 }
 
-function showQuestion() {
-    const q = questions[currentQuizIndex];
-    document.getElementById('question-text').innerText = q.q;
-    const container = document.getElementById('options-container');
-    container.innerHTML = '';
+function renderQuestion(q) {
+    document.getElementById('q-text').innerText = q.q;
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
     
-    q.a.forEach((opt, index) => {
+    q.a.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'option-btn';
+        btn.className = 'option';
         btn.innerText = opt;
-        btn.onclick = () => checkAnswer(index, q.c);
-        container.appendChild(btn);
+        btn.onclick = (e) => handleAnswer(e.target, idx === q.c);
+        grid.appendChild(btn);
     });
 }
 
-function checkAnswer(selected, correct) {
-    if(selected === correct) {
-        userScore += 10;
-        document.getElementById('total-score').innerText = userScore;
-    }
-    currentQuizIndex++;
-    if(currentQuizIndex < questions.length) {
-        setTimeout(showQuestion, 1000);
+function handleAnswer(element, isCorrect) {
+    if(isCorrect) {
+        element.style.background = 'var(--success)';
+        currentScore = parseInt(currentScore) + 10;
     } else {
-        document.getElementById('question-text').innerText = "انتهى التحدي!";
-        updateStats();
+        element.style.background = 'var(--error)';
     }
+    localStorage.setItem('geoScore', currentScore);
+    document.getElementById('score').innerText = currentScore;
+    setTimeout(loadQuiz, 1200);
 }
 
-// 4. نظام المقارنة
-async function loadCountries() {
+function setCategory(cat) {
+    quizCategory = cat;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    loadQuiz();
+}
+
+// 4. المقارنة العسكرية والاقتصادية الشاملة
+async function initCompare() {
     const res = await fetch('countries.json');
-    countries = await res.json();
-    const s1 = document.getElementById('country1');
-    const s2 = document.getElementById('country2');
+    countriesData = await res.json();
+    const s1 = document.getElementById('c1');
+    const s2 = document.getElementById('c2');
     
-    countries.forEach(c => {
-        const opt = `<option value="${c.name}">${c.flag} ${c.name}</option>`;
-        s1.innerHTML += opt;
-        s2.innerHTML += opt;
+    countriesData.forEach(c => {
+        const op = `<option value="${c.name}">${c.flag} ${c.name}</option>`;
+        s1.innerHTML += op; s2.innerHTML += op;
     });
 }
 
-function compareData() {
-    const c1 = countries.find(c => c.name === document.getElementById('country1').value);
-    const c2 = countries.find(c => c.name === document.getElementById('country2').value);
+function performGlobalCompare() {
+    const d1 = countriesData.find(c => c.name === document.getElementById('c1').value);
+    const d2 = countriesData.find(c => c.name === document.getElementById('c2').value);
     
-    document.getElementById('compare-result').innerHTML = `
-        <div class="result-cards" style="display:flex; gap:10px; margin-top:20px;">
-            <div class="card" style="background:#334155; padding:10px; border-radius:10px; flex:1">
-                <h4>${c1.name}</h4>
-                <p>السكان: ${c1.population.toLocaleString()}</p>
-                <p>المساحة: ${c1.area} كم</p>
-            </div>
-            <div class="card" style="background:#334155; padding:10px; border-radius:10px; flex:1">
-                <h4>${c2.name}</h4>
-                <p>السكان: ${c2.population.toLocaleString()}</p>
-                <p>المساحة: ${c2.area} كم</p>
-            </div>
+    const fields = [
+        {k: 'السكان', v: 'population'}, {k: 'المساحة', v: 'area'}, 
+        {k: 'العملة', v: 'currency'}, {k: 'التصنيف العسكري', v: 'militaryRank'},
+        {k: 'نظام الحكم', v: 'government'}, {k: 'الدين الرسمي', v: 'officialReligion'}
+    ];
+
+    document.getElementById('compare-results-grid').innerHTML = fields.map(f => `
+        <div class="data-row">
+            <div class="side-a"><strong>${d1[f.v]}</strong></div>
+            <div class="label-mid" style="color:var(--accent)">${f.k}</div>
+            <div class="side-b"><strong>${d2[f.v]}</strong></div>
         </div>
-    `;
+    `).join('');
 }
 
-// تشغيل عند التحميل
+// البدء
 document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    loadCountries();
+    initAdvancedMap();
+    initCompare();
+    loadQuiz();
+    document.getElementById('score').innerText = currentScore;
 });
