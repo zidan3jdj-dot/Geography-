@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="المركز الجغرافي العربي - الموسوعة الجغرافية الرسمية">
+    <title>المركز الجغرافي العربي | الموسوعة الجغرافية</title>
+    
+    <!-- الخطوط والأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Leaflet للخرائط -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- ملف الأنماط الخاص -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<!-- الشريط العلوي -->
+<div class="top-bar">
+    <div class="logo">
+        <i class="fas fa-globe-africa"></i>
+        <div>
+            <h1>المركز الجغرافي العربي</h1>
+            <p>المرجع الرسمي للمعلومات الجغرافية</p>
+        </div>
+    </div>
+    <button class="btn-outline" onclick="location.reload()">
+        <i class="fas fa-sync-alt"></i> تحديث
+    </button>
+</div>
+
+<!-- الأقسام الرئيسية -->
+<main>
+    <!-- القسم الرئيسي -->
+    <section id="home" class="section active">
+        <div class="facts-section" id="factsContainer"></div>
+        
+        <div class="glass-card">
+            <h2><i class="fas fa-chart-line"></i> لوحة المستكشف</h2>
+            <div class="stats-row">
+                <div class="stat-badge"><div class="value" id="homeScore">0</div><div class="label">🏆 النقاط</div></div>
+                <div class="stat-badge"><div class="value" id="homeCorrect">0</div><div class="label">✅ الإجابات الصحيحة</div></div>
+                <div class="stat-badge"><div class="value" id="homeAccuracy">0%</div><div class="label">🎯 نسبة الدقة</div></div>
+                <div class="stat-badge"><div class="value" id="homeLevel">1</div><div class="label">⭐ المستوى</div></div>
+            </div>
+            <button class="btn" onclick="navigateTo('quiz')"><i class="fas fa-play"></i> ابدأ التحدي الجغرافي</button>
+        </div>
+        
+        <div class="glass-card">
+            <h2><i class="fas fa-info-circle"></i> معلومات سريعة</h2>
+            <p id="quickInfo"></p>
+        </div>
+    </section>
+
+    <!-- قسم الخرائط -->
+    <section id="maps" class="section">
+        <div class="glass-card">
+            <h2><i class="fas fa-map"></i> الخريطة التفاعلية</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="ابحث عن دولة، مدينة، أو معلم...">
+                <button class="btn" onclick="searchLocation()"><i class="fas fa-search"></i> بحث</button>
+            </div>
+            <div id="map"></div>
+            <div class="layer-buttons">
+                <button class="btn-outline" onclick="changeLayer('street')">🗺️ خريطة</button>
+                <button class="btn-outline" onclick="changeLayer('satellite')">🛰️ قمر صناعي</button>
+            </div>
+            <div id="mapInfo"></div>
+        </div>
+    </section>
+
+    <!-- قسم التحدي -->
+    <section id="quiz" class="section">
+        <div class="glass-card">
+            <h2><i class="fas fa-brain"></i> التحدي الجغرافي</h2>
+            <div class="quiz-header">
+                <div class="timer-box">⏱️ <span id="timer">00:15</span></div>
+                <button class="btn-outline" onclick="changeCategory()"><i class="fas fa-exchange-alt"></i> تغيير الفئة</button>
+            </div>
+            <div id="categoryLabel">الفئة: <strong id="currentCategoryName">الكل</strong></div>
+            <div id="question"></div>
+            <div class="answers" id="answers"></div>
+            <div id="quizFeedback"></div>
+            <button id="nextBtn" class="btn" onclick="nextQuestion()">السؤال التالي <i class="fas fa-arrow-left"></i></button>
+        </div>
+    </section>
+
+    <!-- قسم المقارنة -->
+    <section id="compare" class="section">
+        <div class="glass-card">
+            <h2><i class="fas fa-chart-simple"></i> مقارنة شاملة بين الدول</h2>
+            <div class="compare-search">
+                <input type="text" id="searchCountry1" placeholder="ابحث عن دولة..." onkeyup="filterCountries(1)">
+                <input type="text" id="searchCountry2" placeholder="ابحث عن دولة..." onkeyup="filterCountries(2)">
+            </div>
+            <div class="compare-selects">
+                <select id="country1" onchange="compareCountries()"></select>
+                <select id="country2" onchange="compareCountries()"></select>
+            </div>
+            <div id="compareResult"></div>
+            <canvas id="compareChart"></canvas>
+        </div>
+    </section>
+
+    <!-- قسم الإحصائيات -->
+    <section id="stats" class="section">
+        <div class="glass-card">
+            <h2><i class="fas fa-chart-line"></i> الإحصائيات الشخصية</h2>
+            <div class="stats-row">
+                <div class="stat-badge"><div class="value" id="statScore">0</div><div class="label">🏆 النقاط</div></div>
+                <div class="stat-badge"><div class="value" id="statCorrect">0</div><div class="label">✅ الإجابات الصحيحة</div></div>
+                <div class="stat-badge"><div class="value" id="statStreak">0</div><div class="label">🔥 أطول سلسلة</div></div>
+                <div class="stat-badge"><div class="value" id="statAccuracy">0%</div><div class="label">📊 الدقة</div></div>
+                <div class="stat-badge"><div class="value" id="statRank">مبتدئ</div><div class="label">⭐ الرتبة</div></div>
+            </div>
+            <button class="btn-outline" onclick="resetProgress()"><i class="fas fa-trash-alt"></i> إعادة تعيين التقدم</button>
+        </div>
+    </section>
+</main>
+
+<!-- شريط التنقل السفلي -->
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="navigateTo('home')" id="nav-home"><i class="fas fa-home"></i><span>الرئيسية</span></button>
+    <button class="nav-item" onclick="navigateTo('maps')" id="nav-maps"><i class="fas fa-map"></i><span>الخرائط</span></button>
+    <button class="nav-item" onclick="navigateTo('quiz')" id="nav-quiz"><i class="fas fa-question-circle"></i><span>التحدي</span></button>
+    <button class="nav-item" onclick="navigateTo('compare')" id="nav-compare"><i class="fas fa-chart-bar"></i><span>المقارنة</span></button>
+    <button class="nav-item" onclick="navigateTo('stats')" id="nav-stats"><i class="fas fa-chart-line"></i><span>الإحصائيات</span></button>
+</nav>
+
+<!-- ملفات JavaScript -->
+<script src="script.js"></script>
+</body>
+</html>
